@@ -1,45 +1,38 @@
-// Code goes here
-
 var todoList = {
     todos: [],
-    addTodo: function(todoText){
+    addTodo: function(todoText) {
         this.todos.push({
             todoText: todoText,
             completed: false
         });
     },
-    changeTodo: function(position, todoText){
+    changeTodo: function(position, todoText) {
         this.todos[position].todoText = todoText;
     },
-    deleteTodo: function(position){
-        this.todos.splice(position);
+    deleteTodo: function(position) {
+        this.todos.splice(position, 1);
     },
     toggleCompleted: function(position) {
         var todo = this.todos[position];
         todo.completed = !todo.completed;
     },
-    //get number of completed todos
-    toggleAll: function () {
+    toggleAll: function() {
         var totalTodos = this.todos.length;
         var completedTodos = 0;
-        for (var i = 0; i < totalTodos; i++ ){
-            if(this.todos[i].completed === true) {
+
+        this.todos.forEach(function(todo) {
+            if (todo.completed === true) {
                 completedTodos++;
             }
-        }
-        // Case 1
-        if(completedTodos === totalTodos) {
-            for (var i = 0; i < totalTodos; i++) {
-                this.todos[i].completed = false;
-         //Case 2
-            }
-        } else {
-            for (var i = 0; i < totalTodos; i++) {
-                this.todos[i].completed = true;
-            }
-        }
+        });
 
-        this.displayTodos();
+        this.todos.forEach(function(todo) {
+            if (completedTodos === totalTodos) {
+                todo.completed = false;
+            } else {
+                todo.completed = true;
+            }
+        });
     }
 };
 
@@ -58,17 +51,17 @@ var handlers = {
         changeTodoTextInput.value = '';
         view.displayTodos();
     },
-    deleteTodo: function(position){
+    deleteTodo: function(position) {
         todoList.deleteTodo(position);
         view.displayTodos();
     },
-    toggleCompleted: function(){
+    toggleCompleted: function() {
         var toggleCompletedPositionInput = document.getElementById('toggleCompletedPositionInput');
         todoList.toggleCompleted(toggleCompletedPositionInput.valueAsNumber);
         toggleCompletedPositionInput.value = '';
         view.displayTodos();
     },
-    toggleAll: function () {
+    toggleAll: function() {
         todoList.toggleAll();
         view.displayTodos();
     }
@@ -78,21 +71,21 @@ var view = {
     displayTodos: function() {
         var todosUl = document.querySelector('ul');
         todosUl.innerHTML = '';
-        for (var i = 0; i < todoList.todos.length; i++) {
+        
+        todoList.todos.forEach(function(todo,position) {
             var todoLi = document.createElement('li');
-            var todo = todoList.todos[i];
             var todoTextWithCompletion = '';
 
-            if(todo.completed = true) {
-                todoTextWithCompletion = '(x) ' + todo.todoText;
-            } else {
-                todoTextWithCompletion = '() ' + todo.todoText;
-            }
-            todoLi.id = i;
-            todoLi.TextContent = todoTextWithCompletion;
-            todoLi.appendChild(this.createDeleteButton());
-            todosUl.appendChild(todoLi);
-        }
+                if (todo.completed === true) {
+                    todoTextWithCompletion = '(x) ' + todo.todoText;
+                } else {
+                    todoTextWithCompletion = '( ) ' + todo.todoText;
+                }
+            todoLi.id = position;
+                todoLi.textContent = todoTextWithCompletion;
+                todoLi.appendChild(this.createDeleteButton());
+                todosUl.appendChild(todoLi);
+        },this);
     },
     createDeleteButton: function(){
         var deleteButton = document.createElement('button');
@@ -103,12 +96,10 @@ var view = {
     setUpEventListeners: function() {
         var todosUl = document.querySelector('ul');
         todosUl.addEventListener('click', function(event) {
-            //Get the element that was clicked on
-           var elementClicked = event.target;
-           //check if elementClicked is a delete button
-           if (elementClicked.className === 'deleteButton') {
-               handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
-           }
+            var elementClicked = event.target;
+            if (elementClicked.className === 'deleteButton') {
+                handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+            }
         });
     }
 };
